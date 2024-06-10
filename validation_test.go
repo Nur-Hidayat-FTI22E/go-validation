@@ -48,7 +48,7 @@ func TestValidationTwoVariables(t *testing.T) {
 func TestValidationMultipleTag(t *testing.T) {
 	validation := validator.New()
 
-	noHp := ""
+	noHp := "123"
 
 	if err := validation.Var(noHp, "required,numeric"); err != nil {
 		fmt.Println(err.Error())
@@ -57,3 +57,16 @@ func TestValidationMultipleTag(t *testing.T) {
 
 //membuat variabel noHp bertipe data string
 //memeriksa var noHp yg dimana harus hanya memiliki value/nilai numeric walaupun di set dengan tipe data string, jika lain dari numeric atau valuenya kosong maka error
+
+func TestValidationParameter(t *testing.T) {
+	validation := validator.New()
+
+	var myMoney int = 123456
+
+	if err := validation.Var(myMoney, "required,min=5,max=10"); err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+//membuat variabel myMoney dengan tipe data string
+//memeriksa apakah var myMoney memiliki value minimal 5 digit dan maximal 10 digit?, jika tidak maka akan error
