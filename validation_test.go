@@ -70,3 +70,24 @@ func TestValidationParameter(t *testing.T) {
 
 //membuat variabel myMoney dengan tipe data string
 //memeriksa apakah var myMoney memiliki value minimal 5 digit dan maximal 10 digit?, jika tidak maka akan error
+
+func TestStruct(t *testing.T) {
+	type LoginRequest struct {
+		Username string `validate:"required,email"`
+		Password string `validate:"required,min=5"`
+	}
+
+	validate := validator.New()
+
+	RequestLogin := LoginRequest{
+		Username: "struct@gmail.com",
+		Password: "struct",
+	}
+
+	if err := validate.Struct(RequestLogin); err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+//membuat struct LoginRequest serta membuat map RequestLogin yg menangkap LoginRequest struct value
+//memvalidasi vield struct yg ditangkap ke RequestLogin, jika memiliki value type email & password minimal 5 digit maka sukses, sebaliknya maka gagal
