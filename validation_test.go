@@ -91,3 +91,26 @@ func TestStruct(t *testing.T) {
 
 //membuat struct LoginRequest serta membuat map RequestLogin yg menangkap LoginRequest struct value
 //memvalidasi vield struct yg ditangkap ke RequestLogin, jika memiliki value type email & password minimal 5 digit maka sukses, sebaliknya maka gagal
+
+func TestValidationErrors(t *testing.T) {
+	type LoginRequest struct {
+		Username string `validate:"required,email"`
+		Password string `validate:"required,min=5"`
+	}
+
+	validate := validator.New()
+
+	RequestLogin := LoginRequest{
+		Username: "struct@gmail.com",
+		Password: "struct",
+	}
+
+	if err := validate.Struct(RequestLogin); err != nil {
+		ValidatiErrors := err.(validator.ValidationErrors)
+		for _, ValidatiError := range ValidatiErrors {
+			fmt.Println("error in Field", ValidatiError.Field(), "on tag", ValidatiError.Tag(), "with error", ValidatiError.Error())
+		}
+	}
+}
+
+//sama dengan func TestStruct bedanya disini kita membuat agar pesan errornya lebih jelas terbaca dengan menggunakan ValidationError
