@@ -253,7 +253,7 @@ func TestBasicCollection(t *testing.T) {
 		Nama    string   `validate:"required,uppercase"`
 		Umur    string   `validate:"required,number"`
 		Alamat  []Alamat `validate:"required,dive"`
-		Hobbies []string `validate:"required,dive,required,min=2"`
+		Hobbies []string `validate:"required,dive,required,min=2"` //tag 'required' ke 2 untuk memvalidate index string
 	}
 
 	DataDiri := Info{
@@ -279,6 +279,70 @@ func TestBasicCollection(t *testing.T) {
 	}
 
 	if err := ValidasiStruct.Struct(DataDiri); err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+func TestMapValidate(t *testing.T) {
+	validate := validator.New()
+
+	type Alamat struct {
+		Kota  string `validate:"required"`
+		Jalan string `validate:"required"`
+	}
+
+	type School struct {
+		Name   string `validate:"required"`
+		Alamat Alamat `validate:"required"`
+	}
+
+	type Mydata struct {
+		Nama       string            `validate:"required"`
+		Umur       string            `validate:"required,number"`
+		Alamat     Alamat            `validate:"required"`
+		Pendidikan map[string]School `validate:"required,dive,keys,required,min=2,endkeys"`
+	}
+
+	Biodata := Mydata{
+		Nama: "I don't Know",
+		Umur: "004",
+		Alamat: Alamat{
+			Kota:  "Makassar",
+			Jalan: "None II",
+		},
+		Pendidikan: map[string]School{
+			"Sd": {
+				Name: "SDn 2 Lasusua",
+				Alamat: Alamat{
+					Kota:  "Lasusua",
+					Jalan: "Masjid Lama",
+				},
+			},
+			"Smp/Mts": {
+				Name: "MTSn 1 Kolaka Utara",
+				Alamat: Alamat{
+					Kota:  "Lasusua",
+					Jalan: "Jln. Baru",
+				},
+			},
+			"Sma": {
+				Name: "SMKn 1 Lasusua",
+				Alamat: Alamat{
+					Kota:  "Lasusua",
+					Jalan: "perkantoran",
+				},
+			},
+			"Universitas": {
+				Name: "Universitas Muhammadiyah Makassar",
+				Alamat: Alamat{
+					Kota:  "Makassar",
+					Jalan: "Saya lupa",
+				},
+			},
+		},
+	}
+
+	if err := validate.Struct(Biodata); err != nil {
 		fmt.Println(err.Error())
 	}
 }
