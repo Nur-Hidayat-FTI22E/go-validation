@@ -194,3 +194,48 @@ func TestLoopingStruct(t *testing.T) {
 
 	fmt.Println(string(Mydata))
 }
+
+func TestCollection(t *testing.T) {
+	ValidasiStruct := validator.New()
+
+	type Alamat struct {
+		Provinsi  string `validate:"required"`
+		Kabupaten string `validate:"required"`
+		Kota      string `validate:"required"`
+		Kecamatan string `validate:"required"`
+		Jalan     string `validate:"required"`
+	}
+
+	type Info struct {
+		NoId   int      `validate:"required"`
+		Nama   string   `validate:"required,uppercase"`
+		Umur   string   `validate:"required,number"`
+		Alamat []Alamat `validate:"required,dive"`
+	}
+
+	DataDiri := Info{
+		NoId: 12,
+		Nama: "YOURNAME",
+		Umur: "12",
+		Alamat: []Alamat{
+			{
+				Provinsi:  "SulTra",
+				Kabupaten: "Kolaka Utara",
+				Kota:      "Lasusua",
+				Kecamatan: "Lasusua",
+				Jalan:     "Jln. Anonim",
+			},
+			{
+				Provinsi:  "",
+				Kabupaten: "",
+				Kota:      "",
+				Kecamatan: "",
+				Jalan:     "",
+			},
+		},
+	}
+
+	if err := ValidasiStruct.Struct(DataDiri); err != nil {
+		fmt.Println(err.Error())
+	}
+}
