@@ -239,3 +239,46 @@ func TestCollection(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 }
+
+func TestBasicCollection(t *testing.T) {
+	ValidasiStruct := validator.New()
+
+	type Alamat struct {
+		Kota  string `validate:"required"`
+		Jalan string `validate:"required"`
+	}
+
+	type Info struct {
+		NoId    int      `validate:"required"`
+		Nama    string   `validate:"required,uppercase"`
+		Umur    string   `validate:"required,number"`
+		Alamat  []Alamat `validate:"required,dive"`
+		Hobbies []string `validate:"required,dive,required,min=2"`
+	}
+
+	DataDiri := Info{
+		NoId: 12,
+		Nama: "YOURNAME",
+		Umur: "12",
+		Alamat: []Alamat{
+			{
+				Kota:  "Lasusua",
+				Jalan: "Jln. Anonim",
+			},
+			{
+				Kota:  "Makassar",
+				Jalan: "Jln. Anonim II",
+			},
+		},
+		Hobbies: []string{
+			"Ngoprek",
+			"Ngoding",
+			"",  //error on the 'required' tag
+			"?", //error on the 'min' tag
+		},
+	}
+
+	if err := ValidasiStruct.Struct(DataDiri); err != nil {
+		fmt.Println(err.Error())
+	}
+}
