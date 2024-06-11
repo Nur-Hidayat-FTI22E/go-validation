@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -114,3 +115,82 @@ func TestValidationErrors(t *testing.T) {
 }
 
 //sama dengan func TestStruct bedanya disini kita membuat agar pesan errornya lebih jelas terbaca dengan menggunakan ValidationError
+
+func TestRegisterPass(t *testing.T) {
+
+	type PassUser struct {
+		Username        string `validate:"required"`
+		Password        string `validate:"required,min=8"`
+		ConfirmPassword string `validate:"required,eqfield=Password"`
+	}
+	validation := validator.New()
+
+	UserPass := PassUser{
+		Username:        "Username",
+		Password:        "12343564",
+		ConfirmPassword: "1234354",
+	}
+
+	if err := validation.Struct(UserPass); err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+// NO KOMEN..!!!
+
+func TestLoopingStruct(t *testing.T) {
+	ValidasiStruct := validator.New()
+
+	type Alamat struct {
+		Provinsi  string `validate:"required"`
+		Kabupaten string `validate:"required"`
+		Kota      string `validate:"required"`
+		Kecamatan string `validate:"required"`
+		Jalan     string `validate:"required"`
+	}
+
+	type Kontak struct {
+		NoHp  string `validate:"required,numeric,min=10,max=13"`
+		NoWa  string `validate:"required,numeric,min=10,max=13"`
+		Email string `validate:"required,email"`
+	}
+
+	type Info struct {
+		NoId   int    `validate:"required"`
+		Nama   string `validate:"required,uppercase"`
+		Umur   string `validate:"required,number"`
+		Alamat Alamat `validate:"required"`
+		Kontak Kontak `validate:"required"`
+	}
+
+	DataDiri := Info{
+		NoId: 12,
+		Nama: "YOURNAME",
+		Umur: "12",
+		Alamat: Alamat{
+			Provinsi:  "SulTra",
+			Kabupaten: "Kolaka Utara",
+			Kota:      "Lasusua",
+			Kecamatan: "Lasusua",
+			Jalan:     "Jln. Anonim",
+		},
+		Kontak: Kontak{
+			NoHp:  "0988799081",
+			NoWa:  "5478927391",
+			Email: "example@example.com",
+		},
+	}
+
+	if err := ValidasiStruct.Struct(DataDiri); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	Mydata, err := json.MarshalIndent(DataDiri, "", "  ")
+	if err != nil {
+		fmt.Println("Error marshalling to JSON:", err)
+		return
+	}
+
+	fmt.Println(string(Mydata))
+}
